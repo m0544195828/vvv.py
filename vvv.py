@@ -1,16 +1,13 @@
 import requests
-import urllib3
 import smtplib
 from email.message import EmailMessage
-
-# ביטול אזהרות SSL
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+import os
 
 def download_images(count=10):
     image_data_list = []
     for i in range(count):
-        url = "https://picsum.photos/600/400"
-        response = requests.get(url, verify=False)  # עוקף בדיקת SSL
+        url = f"https://picsum.photos/600/400?random={i}"
+        response = requests.get(url)
         if response.status_code == 200:
             image_data_list.append({
                 "filename": f"image_{i+1}.jpg",
@@ -36,14 +33,21 @@ def send_email_with_images(sender_email, sender_password, recipient_email, subje
         smtp.send_message(msg)
 
 if __name__ == "__main__":
-    YOUR_EMAIL = "mf0583275242@gmail.com"
-    YOUR_PASSWORD = "gjzrznpbzvzfsmzw"  # App Password
-    RECEIVER_EMAIL = "m0544195828@gmail.com"
+    YOUR_EMAIL = os.environ["SENDER_EMAIL"]
+    YOUR_PASSWORD = os.environ["SENDER_PASSWORD"]
+    RECEIVER_EMAIL = os.environ["RECEIVER_EMAIL"]
 
     try:
         images = download_images()
-        send_email_with_images(YOUR_EMAIL, YOUR_PASSWORD, RECEIVER_EMAIL,
-                               "10 תמונות אקראיות", "מצורפות 10 תמונות מאתר picsum.photos", images)
+        send_email_with_images(
+            YOUR_EMAIL,
+            YOUR_PASSWORD,
+            RECEIVER_EMAIL,
+            "📷 תמונות אקראיות מ-Picsum",
+            "מצורפות 10 תמונות",
+            images
+        )
         print("✅ ההודעה נשלחה בהצלחה!")
     except Exception as e:
         print("❌ אירעה שגיאה:", e)
+
