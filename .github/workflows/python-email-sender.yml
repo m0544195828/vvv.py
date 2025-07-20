@@ -1,4 +1,4 @@
-name: Run Email Script
+name: Send Random Images via Email
 
 on:
   workflow_dispatch:
@@ -6,21 +6,22 @@ on:
 jobs:
   send_email:
     runs-on: ubuntu-latest
-    env:
-      EMAIL_USER: "mf0583275242@gmail.com"
-      EMAIL_PASS: "gjzrznpbzvzfsmzw"
-      EMAIL_TO: "m0544195828@gmail.com"
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+    - name: Clone Repo
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    - name: Install Dependencies
+      run: pip install requests
 
-      - name: Run email script
-        run: python vvv.py
+    - name: Run Python Script
+      env:
+        SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+        SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+        RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+      run: python main.py
+
