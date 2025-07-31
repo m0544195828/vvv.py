@@ -8,10 +8,10 @@ EMAIL_SENDER = "mf0583275242@gmail.com"
 EMAIL_PASSWORD = "gjzrznpbzvzfsmzw"
 EMAIL_RECEIVER = "m0544195828@email.com"
 
-def generate_random_people_images(n=10):
+def generate_random_people_images(n=40):
     images = []
     for i in range(n):
-        gender = random.choice(['men', 'women'])
+        gender = random.choice(['women'])
         number = random.randint(0, 99)
         url = f"https://randomuser.me/api/portraits/{gender}/{number}.jpg"
         response = requests.get(url)
