@@ -1,53 +1,29 @@
-import requests
+import random
 import smtplib
 from email.message import EmailMessage
-import os
 
-def download_images(count=10):
-    image_data_list = []
-    for i in range(count):
-        url = f"https://picsum.photos/600/400?random={i}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            image_data_list.append({
-                "filename": f"image_{i+1}.jpg",
-                "data": response.content
-            })
-    return image_data_list
+EMAIL_SENDER = "mf0583275242@gmail.com"
+EMAIL_PASSWORD = "gjzrznpbzvzfsmzw"
+EMAIL_RECEIVER = "m0544195828@email.com"
 
-def send_email_with_images(sender_email, sender_password, recipient_email, subject, body, images):
+def generate_random_image_urls(n=10):
+    # picsum.photos לא דורש API
+    urls = [f"https://picsum.photos/seed/{random.randint(1000,9999)}/800/500" for _ in range(n)]
+    return urls
+
+def send_email(image_urls):
     msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = sender_email
-    msg["To"] = recipient_email
+    msg["Subject"] = "📸 10 תמונות אקראיות"
+    msg["From"] = EMAIL_SENDER
+    msg["To"] = EMAIL_RECEIVER
+
+    body = "הנה 10 תמונות אקראיות (ללא API):\n\n" + "\n".join(image_urls)
     msg.set_content(body)
 
-    for img in images:
-        msg.add_attachment(img["data"],
-                           maintype="image",
-                           subtype="jpeg",
-                           filename=img["filename"])
-
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login(sender_email, sender_password)
+        smtp.login(EMAIL_SENDER, EMAIL_PASSWORD)
         smtp.send_message(msg)
 
 if __name__ == "__main__":
-    YOUR_EMAIL = os.environ["SENDER_EMAIL"]
-    YOUR_PASSWORD = os.environ["SENDER_PASSWORD"]
-    RECEIVER_EMAIL = os.environ["RECEIVER_EMAIL"]
-
-    try:
-        images = download_images()
-        send_email_with_images(
-            YOUR_EMAIL,
-            YOUR_PASSWORD,
-            RECEIVER_EMAIL,
-            "📷 תמונות אקראיות מ-Picsum",
-            "מצורפות 10 תמונות",
-            images
-        )
-        print("✅ ההודעה נשלחה בהצלחה!")
-    except Exception as e:
-        print("❌ אירעה שגיאה:", e)
-
+    urls = generate_random_image_urls()
+    send_email(urls)
