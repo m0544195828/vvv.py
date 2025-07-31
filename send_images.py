@@ -8,27 +8,29 @@ EMAIL_SENDER = "mf0583275242@gmail.com"
 EMAIL_PASSWORD = "gjzrznpbzvzfsmzw"
 EMAIL_RECEIVER = "m0544195828@email.com"
 
-def generate_random_images(n=10):
-    urls = [f"https://picsum.photos/seed/{random.randint(1000,9999)}/800/500" for _ in range(n)]
+def generate_random_people_images(n=10):
     images = []
-    for i, url in enumerate(urls):
+    for i in range(n):
+        gender = random.choice(['men', 'women'])
+        number = random.randint(0, 99)
+        url = f"https://randomuser.me/api/portraits/{gender}/{number}.jpg"
         response = requests.get(url)
         if response.ok:
-            cid = make_msgid(domain="picsum.photos")
+            cid = make_msgid(domain="randomuser.me")[1:-1]
             images.append({
-                "cid": cid[1:-1],  # remove <>
+                "cid": cid,
                 "data": response.content,
-                "filename": f"image{i+1}.jpg"
+                "filename": f"{gender}_{number}.jpg"
             })
     return images
 
 def send_email_with_images(images):
     msg = EmailMessage()
-    msg["Subject"] = "📸 תמונות אקראיות בגוף המייל"
+    msg["Subject"] = "📸 תמונות אנשים אקראיות בגוף המייל"
     msg["From"] = EMAIL_SENDER
     msg["To"] = EMAIL_RECEIVER
 
-    html_content = "<h3>הנה 10 תמונות אקראיות:</h3>"
+    html_content = "<h3>הנה 10 תמונות אנשים אקראיות:</h3>"
     for img in images:
         html_content += f'<img src="cid:{img["cid"]}" style="margin:10px"><br>'
 
@@ -49,5 +51,5 @@ def send_email_with_images(images):
         smtp.send_message(msg)
 
 if __name__ == "__main__":
-    images = generate_random_images()
+    images = generate_random_people_images()
     send_email_with_images(images)
